@@ -569,7 +569,6 @@ func jobFromResourceData(d *schema.ResourceData) (*JobDetail, error) {
 	editableNodeFilter := d.Get("editable_node_filter")
 	if editableNodeFilter != nil {
 		job.EditableNodeFilter = editableNodeFilter.(bool)
-		// return nil, fmt.Errorf("editable_node_filter=[%t]", editableNodeFilter)
 	}
 
 	if d.Get("node_filter_query").(string) != "" {
