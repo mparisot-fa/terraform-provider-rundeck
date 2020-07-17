@@ -96,6 +96,11 @@ func resourceRundeckJob() *schema.Resource {
 				Default:  "node-first",
 			},
 
+			"editable_node_filter": {
+				Type:     schema.TypeBool,
+				Optional: true,
+			},
+
 			"node_filter_query": {
 				Type:     schema.TypeString,
 				Optional: true,
@@ -435,6 +440,7 @@ func jobFromResourceData(d *schema.ResourceData) (*JobDetail, error) {
 		ExecutionEnabled:          d.Get("execution_enabled").(bool),
 		ScheduleEnabled:           d.Get("schedule_enabled").(bool),
 		LogLevel:                  d.Get("log_level").(string),
+		EditableNodeFilter:        d.Get("editable_node_filter").(bool),
 		AllowConcurrentExecutions: d.Get("allow_concurrent_executions").(bool),
 		Dispatch: &JobDispatch{
 			MaxThreadCount:  d.Get("max_thread_count").(int),
@@ -558,6 +564,12 @@ func jobFromResourceData(d *schema.ResourceData) (*JobDetail, error) {
 			optionsConfig.Options = append(optionsConfig.Options, option)
 		}
 		job.OptionsConfig = optionsConfig
+	}
+
+	editableNodeFilter := d.Get("editable_node_filter")
+	if editableNodeFilter != nil {
+		job.EditableNodeFilter = editableNodeFilter.(bool)
+		// return nil, fmt.Errorf("editable_node_filter=[%t]", editableNodeFilter)
 	}
 
 	if d.Get("node_filter_query").(string) != "" {
@@ -719,6 +731,7 @@ func jobToResourceData(job *JobDetail, d *schema.ResourceData) error {
 		d.Set("rank_order", "ascending")
 	}
 
+	d.Set("editable_node_filter", job.EditableNodeFilter)
 	d.Set("node_filter_query", nil)
 	d.Set("node_filter_exclude_precedence", nil)
 	if job.NodeFilter != nil {
